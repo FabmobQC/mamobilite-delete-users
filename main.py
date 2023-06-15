@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # for Python < 3.9
 import json
 from typing import TypedDict
 from typing import List
@@ -29,9 +29,9 @@ def get_db(db_url: str) -> database.Database:
 
 
 def get_users_list(file_name: str) -> List[str]:
-    with open(file_name) as user_file:
-        users = user_file.readlines()
-    return users
+    with open(file_name) as file:
+        users_dirty = file.readlines()
+    return [user.strip() for user in users_dirty]
 
 
 def parse_options(argv: List[str]):

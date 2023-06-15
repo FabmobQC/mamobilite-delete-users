@@ -1,4 +1,4 @@
-from __future__ import annotations
+from __future__ import annotations  # for Python < 3.9
 from typing import List
 
 from pymongo import database
