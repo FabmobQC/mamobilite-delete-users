@@ -1,5 +1,7 @@
+from __future__ import annotations
 import json
 from typing import TypedDict
+from typing import List
 import getopt
 import sys
 
@@ -26,13 +28,13 @@ def get_db(db_url: str) -> database.Database:
     return client.Stage_database
 
 
-def get_users_list(file_name: str) -> list[str]:
+def get_users_list(file_name: str) -> List[str]:
     with open(file_name) as user_file:
         users = user_file.readlines()
     return users
 
 
-def parse_options(argv: list[str]):
+def parse_options(argv: List[str]):
     def print_usage_and_leave():
         instructions = "main.py --by_email <file>" + "\nmain.py --by_token <file>"
         print(instructions)
