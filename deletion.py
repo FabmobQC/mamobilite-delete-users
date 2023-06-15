@@ -6,14 +6,14 @@ from pymongo import database
 
 def delete_user(db: database.Database, users_list: List[str]):
     print(f"Deleting users: {users_list}")
-    db.Stage_analysis_timeseries.deleteMany({"user_id": {"$in": users_list}})
-    db.Stage_pipeline_state.deleteMany({"user_id": {"$in": users_list}})
-    db.Stage_timeseries.deleteMany({"user_id": {"$in": users_list}})
-    db.Stage_usercache.deleteMany({"user_id": {"$in": users_list}})
+    db.Stage_analysis_timeseries.delete_many({"user_id": {"$in": users_list}})
+    db.Stage_pipeline_state.delete_many({"user_id": {"$in": users_list}})
+    db.Stage_timeseries.delete_many({"user_id": {"$in": users_list}})
+    db.Stage_usercache.delete_many({"user_id": {"$in": users_list}})
     # Last to retrieve user_id in case of failure
-    db.Stage_uuids.deleteMany({"uuid": {"$in": users_list}})
+    db.Stage_uuids.delete_many({"uuid": {"$in": users_list}})
     # Really last to retrieve user_id in case of failure
-    db.Stage_Profiles.deleteMany({"user_id": {"$in": users_list}})
+    db.Stage_Profiles.delete_many({"user_id": {"$in": users_list}})
 
 
 def get_user_ids_by_email(db: database.Database, email: str | None) -> List[str]:
