@@ -5,6 +5,8 @@ import sys
 
 from pymongo import MongoClient, database
 
+from deletion import delete_by_email, delete_by_token
+
 
 class Config(TypedDict):
     db_url: str
@@ -74,9 +76,9 @@ def main():
     db = get_db(config["db_url"])
     users_list = get_users_list(file_name)
     if is_by_email:
-        delete_by_email(db)
+        delete_by_email(db, users_list)
     else:
-        delete_by_token(db)
+        delete_by_token(db, users_list)
 
 
 if __name__ == "__main__":
