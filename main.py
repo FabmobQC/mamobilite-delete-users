@@ -1,13 +1,12 @@
 from __future__ import annotations  # for Python < 3.9
 import json
-from typing import TypedDict
-from typing import List
+from typing import List, Tuple, TypedDict
 import getopt
 import sys
 
 from pymongo import MongoClient, database
 
-from deletion import delete_by_email, delete_by_token
+from deletion import delete_by_email, delete_by_token, delete_by_before_date
 
 
 class Config(TypedDict):
@@ -34,9 +33,13 @@ def get_users_list(file_name: str) -> List[str]:
     return [user.strip() for user in users_dirty]
 
 
-def parse_options(argv: List[str]):
+def parse_options(argv: List[str]) -> Tuple[str, str]:
     def print_usage_and_leave():
-        instructions = "main.py --by_email <file>" + "\nmain.py --by_token <file>"
+        instructions = (
+            "main.py --by_email <filename>"
+            + "\nmain.py --by_token <filename>"
+            + "\nmain.py --by_before_date <date>"
+        )
         print(instructions)
         sys.exit(2)
 
@@ -44,43 +47,46 @@ def parse_options(argv: List[str]):
         opts, args = getopt.getopt(
             argv,
             "x",
-            [
-                "by_email=",
-                "by_token=",
-            ],
+            ["by_email=", "by_token=", "by_before_date="],
         )
     except getopt.GetoptError as err:
         print(err)
         print_usage_and_leave()
 
-    by_email = False
-    by_token = False
-    file_name = None
+    total_set = 0
+    mode = ""
+    mode_value = ""
 
     for option, value in opts:
-        file_name = value
         if option == "--by_email":
-            by_email = True
+            total_set += 1
         elif option == "--by_token":
-            by_token = True
+            total_set += 1
+        elif option == "--by_before_date":
+            total_set += 1
         else:
             print_usage_and_leave()
+        mode = option.replace("--", "")
+        mode_value = value
 
-    if by_email == by_token:  # both false or both true
+    if total_set != 1:  # only one option can be set
         print_usage_and_leave()
 
-    return by_email, file_name
+    return mode, mode_value
 
 
 def main():
-    is_by_email, file_name = parse_options(sys.argv[1:])
+    mode, mode_value = parse_options(sys.argv[1:])
     config = read_config()
     db = get_db(config["db_url"])
-    users_list = get_users_list(file_name)
-    if is_by_email:
+    if mode == "by_email":
+        users_list = get_users_list(mode_value)
         delete_by_email(db, users_list)
-    else:
+    elif mode == "by_token":
+        users_list = get_users_list(mode_value)
         delete_by_token(db, users_list)
+    elif mode == "by_before_date":
+        delete_by_before_date(db, mode_value)
 
 
 if __name__ == "__main__":
